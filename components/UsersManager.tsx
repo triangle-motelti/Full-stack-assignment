@@ -10,9 +10,10 @@ import { Pagination } from "./Pagination";
 interface UsersManagerProps {
   users: SerializedUser[];
   meta: PaginationMeta;
+  currentUserRole: "admin" | "member";
 }
 
-export function UsersManager({ users, meta }: UsersManagerProps) {
+export function UsersManager({ users, meta, currentUserRole }: UsersManagerProps) {
   const router = useRouter();
   const [editingUser, setEditingUser] = useState<SerializedUser | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -63,15 +64,19 @@ export function UsersManager({ users, meta }: UsersManagerProps) {
                 <th className="py-3 pr-4">Name</th>
                 <th className="py-3 pr-4">Email</th>
                 <th className="py-3 pr-4">Role</th>
-                <th className="py-3 pr-4 text-right">Salary</th>
-                <th className="py-3 pr-4">Start Date</th>
-                <th className="py-3 text-right">Actions</th>
+                {currentUserRole === "admin" && (
+                  <>
+                    <th className="py-3 pr-4 text-right">Salary</th>
+                    <th className="py-3 pr-4">Start Date</th>
+                    <th className="py-3 text-right">Actions</th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
+                  <td colSpan={currentUserRole === "admin" ? 6 : 3} className="py-8 text-center text-slate-500">
                     No users match the current filter.
                   </td>
                 </tr>
@@ -91,31 +96,35 @@ export function UsersManager({ users, meta }: UsersManagerProps) {
                         {user.role}
                       </span>
                     </td>
-                    <td className="py-3 pr-4 text-right font-mono text-slate-800">
-                      ${user.salary}
-                    </td>
-                    <td className="py-3 pr-4 text-slate-600">
-                      {user.startDate.slice(0, 10)}
-                    </td>
-                    <td className="py-3 text-right">
-                      <div className="inline-flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setEditingUser(user)}
-                          className="rounded-md border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          disabled={deletingId === user.id}
-                          onClick={() => handleDelete(user)}
-                          className="rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
-                        >
-                          {deletingId === user.id ? "..." : "Delete"}
-                        </button>
-                      </div>
-                    </td>
+                    {currentUserRole === "admin" && (
+                      <>
+                        <td className="py-3 pr-4 text-right font-mono text-slate-800">
+                          ${user.salary}
+                        </td>
+                        <td className="py-3 pr-4 text-slate-600">
+                          {user.startDate.slice(0, 10)}
+                        </td>
+                        <td className="py-3 text-right">
+                          <div className="inline-flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setEditingUser(user)}
+                              className="rounded-md border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              disabled={deletingId === user.id}
+                              onClick={() => handleDelete(user)}
+                              className="rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                            >
+                              {deletingId === user.id ? "..." : "Delete"}
+                            </button>
+                          </div>
+                        </td>
+                      </>
+                    )}
                   </tr>
                 ))
               )}

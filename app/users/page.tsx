@@ -1,4 +1,5 @@
 import { listUsers } from "@/services/users";
+import { getCurrentUser } from "@/lib/auth";
 import { UserStats } from "@/components/UserStats";
 import { SearchInput } from "@/components/SearchInput";
 import { UsersManager } from "@/components/UsersManager";
@@ -14,12 +15,15 @@ type UsersSearchParams = Promise<{
 
 export default async function UsersPage({ searchParams }: { searchParams: UsersSearchParams }) {
   const params = await searchParams;
-  const result = await listUsers({
+  const [result, currentUser] = await Promise.all([
+    listUsers({
     page: params.page,
-    size: params.size,
-    role: params.role,
-    search: params.search,
-  });
+      size: params.size,
+      role: params.role,
+      search: params.search,
+    }),
+    getCurrentUser(),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 space-y-6">
@@ -32,7 +36,7 @@ export default async function UsersPage({ searchParams }: { searchParams: UsersS
 
       <UserStats stats={result.stats} />
       <SearchInput initialSearch={params.search ?? ""} initialRole={params.role ?? ""} />
-      <UsersManager users={result.items} meta={result.meta} />
+      <UsersManager users={result.items} meta={result.meta} currentUserRole={currentUser?.role ?? "member"} />
     </main>
   );
 }
