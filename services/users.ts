@@ -30,6 +30,10 @@ export interface SerializedUser {
   createdAt: string;
 }
 
+export interface SerializedUserWithPassword extends SerializedUser {
+  password: string;
+}
+
 export function serializeUser(user: User): SerializedUser {
   return {
     id: user.id,
@@ -39,6 +43,13 @@ export function serializeUser(user: User): SerializedUser {
     salary: user.salary.toFixed(2),
     startDate: user.startDate.toISOString(),
     createdAt: user.createdAt.toISOString(),
+  };
+}
+
+export function serializeUserWithPassword(user: User): SerializedUserWithPassword {
+  return {
+    ...serializeUser(user),
+    password: user.password ?? "",
   };
 }
 
@@ -195,4 +206,10 @@ export async function deleteUser(id: string): Promise<SerializedUser> {
     }
     throw err;
   }
+}
+
+export async function getUserByEmailWithPassword(email: string): Promise<SerializedUserWithPassword | null> {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return null;
+  return serializeUserWithPassword(user);
 }
