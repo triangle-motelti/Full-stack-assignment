@@ -52,15 +52,7 @@ export default function LoginPage() {
               {isLoading ? "Signing in..." : "Sign in"}
             </button>
           </form>
-          <div className="mt-8 space-y-4 text-sm text-slate-600">
-            <p className="text-center"><strong className="text-slate-900">Demo Accounts:</strong></p>
-            <div className="space-y-2 text-xs font-mono bg-slate-50 rounded-lg p-4">
-              <div><span className="font-semibold text-slate-700">Admins:</span><ul className="mt-1 space-y-1 ml-4 list-disc"><li>abdellatif.elfany@example.com / Admin@2024!SecurePass1</li><li>mohamed.telti@example.com / Mohamed@2024!AdminPass2</li><li>driss.sijelmassi@example.com / Driss@2024!SuperAdmin3</li></ul></div>
-              <div className="pt-2 border-t border-slate-200"><span className="font-semibold text-slate-700">Members:</span><ul className="mt-1 space-y-1 ml-4 list-disc"><li>member1@example.com / Member@2024!TestPass1</li><li>member2@example.com / Member@2024!TestPass2</li></ul></div>
-            </div>
-          </div>
         </div>
-        <p className="mt-6 text-center text-sm text-slate-500"><Link href="/" className="text-slate-600 hover:text-slate-900 underline">Back to Dashboard</Link></p>
       </div>
     </main>
   );
