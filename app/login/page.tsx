@@ -1,0 +1,67 @@
+"use client";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+
+interface FormState { email: string; password: string; }
+
+export default function LoginPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/users";
+  const [values, setValues] = useState<FormState>({ email: "", password: "" });
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleChange = (field: keyof FormState, value: string) => {
+    setValues((prev) => ({ ...prev, [field]: value }));
+    if (error) setError(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); setError(null); setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(values) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { setError(data.error || "Invalid email or password"); return; }
+      router.push(callbackUrl); router.refresh();
+    } catch { setError("Network error. Please try again."); }
+    finally { setIsLoading(false); }
+  };
+
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <Link href="/" className="text-2xl font-bold text-slate-900">Team Directory</Link>
+          <h1 className="mt-6 text-3xl font-bold text-slate-900">Sign in</h1>
+          <p className="mt-2 text-slate-600">Enter your credentials to access the dashboard</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+          {error && <div className="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-600" role="alert">{error}</div>}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+              <input id="email" type="email" autoComplete="email" value={values.email} onChange={(e) => handleChange("email", e.target.value)} placeholder="you@example.com" className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-600" required disabled={isLoading} />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+              <input id="password" type="password" autoComplete="current-password" value={values.password} onChange={(e) => handleChange("password", e.target.value)} placeholder="••••••••" className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-600" required disabled={isLoading} />
+            </div>
+            <button type="submit" disabled={isLoading} className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50">
+              {isLoading ? "Signing in..." : "Sign in"}
+            </button>
+          </form>
+          <div className="mt-8 space-y-4 text-sm text-slate-600">
+            <p className="text-center"><strong className="text-slate-900">Demo Accounts:</strong></p>
+            <div className="space-y-2 text-xs font-mono bg-slate-50 rounded-lg p-4">
+              <div><span className="font-semibold text-slate-700">Admins:</span><ul className="mt-1 space-y-1 ml-4 list-disc"><li>abdellatif.elfany@example.com / Admin@2024!SecurePass1</li><li>mohamed.telti@example.com / Mohamed@2024!AdminPass2</li><li>driss.sijelmassi@example.com / Driss@2024!SuperAdmin3</li></ul></div>
+              <div className="pt-2 border-t border-slate-200"><span className="font-semibold text-slate-700">Members:</span><ul className="mt-1 space-y-1 ml-4 list-disc"><li>member1@example.com / Member@2024!TestPass1</li><li>member2@example.com / Member@2024!TestPass2</li></ul></div>
+            </div>
+          </div>
+        </div>
+        <p className="mt-6 text-center text-sm text-slate-500"><Link href="/" className="text-slate-600 hover:text-slate-900 underline">Back to Dashboard</Link></p>
+      </div>
+    </main>
+  );
+}
