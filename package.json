@@ -13,6 +13,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
+    "@tailwindcss/turbopack": "^4.3.3",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.3",
     "decimal.js": "^10.6.0",
@@ -21,11 +22,11 @@
     "pg": "^8.16.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "tailwindcss": "^4.3.3",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.5",
-    "@tailwindcss/turbopack": "4.3.3",
     "@types/node": "^22.20.5",
     "@types/pg": "^8.15.0",
     "@types/react": "^19",
@@ -34,7 +35,6 @@
     "eslint-config-next": "16.4.6",
     "postcss": "^8.5.32",
     "prisma": "^7.10.1",
-    "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.1.0"
