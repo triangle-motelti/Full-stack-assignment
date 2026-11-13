@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, Role } from "../lib/generated/prisma/client";
+import bcrypt from "bcryptjs";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -10,6 +11,55 @@ if (!connectionString) {
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
+// Hardcoded admin users
+const ADMIN_USERS = [
+  {
+    name: "Abdellatif Elfany",
+    email: "abdellatif.elfany@example.com",
+    role: "admin" as const,
+    password: "Admin@2024!SecurePass1",
+    salary: "120000.00",
+    startDate: new Date("2019-01-15"),
+  },
+  {
+    name: "Mohamed Telti",
+    email: "mohamed.telti@example.com",
+    role: "admin" as const,
+    password: "Mohamed@2024!AdminPass2",
+    salary: "115000.00",
+    startDate: new Date("2020-03-20"),
+  },
+  {
+    name: "Driss Sijelmassi",
+    email: "driss.sijelmassi@example.com",
+    role: "admin" as const,
+    password: "Driss@2024!SuperAdmin3",
+    salary: "118000.00",
+    startDate: new Date("2018-11-10"),
+  },
+];
+
+// Hardcoded member users
+const MEMBER_USERS = [
+  {
+    name: "Test Member One",
+    email: "member1@example.com",
+    role: "member" as const,
+    password: "Member@2024!TestPass1",
+    salary: "55000.00",
+    startDate: new Date("2023-06-01"),
+  },
+  {
+    name: "Test Member Two",
+    email: "member2@example.com",
+    role: "member" as const,
+    password: "Member@2024!TestPass2",
+    salary: "58000.00",
+    startDate: new Date("2024-01-15"),
+  },
+];
+
+// Existing seed users (25 users)
 const SEED_USERS: Array<{
   name: string;
   email: string;
@@ -62,7 +112,50 @@ const SEED_PROJECTS = [
   { name: "Invoice PDF Generator", status: "active", budget: "22000.00" },
 ];
 
+async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 12);
+}
+
 async function main() {
+  // First, create hardcoded admin and member users
+  console.log("Creating hardcoded admin users...");
+  for (const user of ADMIN_USERS) {
+    const hashedPassword = await hashPassword(user.password);
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        password: hashedPassword,
+        salary: user.salary,
+        startDate: user.startDate,
+      },
+    });
+    console.log(`  Created admin: ${user.name} (${user.email})`);
+  }
+
+  console.log("Creating hardcoded member users...");
+  for (const user of MEMBER_USERS) {
+    const hashedPassword = await hashPassword(user.password);
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        password: hashedPassword,
+        salary: user.salary,
+        startDate: user.startDate,
+      },
+    });
+    console.log(`  Created member: ${user.name} (${user.email})`);
+  }
+
+  // Then seed the remaining users (without passwords - they won't be able to log in)
+  console.log("Seeding additional users...");
   for (const user of SEED_USERS) {
     await prisma.user.upsert({
       where: { email: user.email },
@@ -78,7 +171,7 @@ async function main() {
     });
   }
 
-  console.log(`Seeded ${SEED_USERS.length} users and ${SEED_PROJECTS.length} projects.`);
+  console.log(`Seeded ${ADMIN_USERS.length} admin users, ${MEMBER_USERS.length} member users, ${SEED_USERS.length} additional users, and ${SEED_PROJECTS.length} projects.`);
 }
 
 main()

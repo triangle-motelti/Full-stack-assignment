@@ -16,11 +16,11 @@ model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
+  password  String?
   role      Role     @default(member)
   salary    Decimal  @db.Decimal(12, 2)
   startDate DateTime
   createdAt DateTime @default(now())
-
   @@index([name])
   @@index([role])
   @@index([createdAt])
