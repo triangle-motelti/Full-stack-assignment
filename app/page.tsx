@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { listUsers } from "@/services/users";
 import { listProjects } from "@/services/projects";
+import { requireAuth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  await requireAuth();
   const [usersResult, projectsResult] = await Promise.all([
     listUsers({ page: 1, size: 5 }),
     listProjects({ page: 1, size: 5 }),

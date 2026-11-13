@@ -1,4 +1,5 @@
 import { listProjects } from "@/services/projects";
+import { requireAuth } from "@/lib/auth";
 import { Pagination } from "@/components/Pagination";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +10,7 @@ type ProjectsSearchParams = Promise<{
 }>;
 
 export default async function ProjectsPage({ searchParams }: { searchParams: ProjectsSearchParams }) {
+  await requireAuth();
   const params = await searchParams;
   const { items, meta } = await listProjects({
     page: params.page,
